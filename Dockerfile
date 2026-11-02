@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     HF_HOME=/app/.cache/huggingface
 WORKDIR /app
 
-# CPU-only torch: ~1 GB image instead of ~5 GB with CUDA wheels. Inference is tiny.
+# CPU-only torch skips the multi-GB CUDA wheels (image: ~670 MB compressed). Inference is tiny.
 RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 COPY requirements.txt .
 RUN pip install -r requirements.txt
@@ -19,7 +19,8 @@ COPY . .
 # The image only builds if the test suite passes.
 RUN python -m pytest -q -p no:cacheprovider
 
-RUN useradd --create-home appuser && chown -R appuser /app
+# No chown: the app only reads /app, and chown -R would duplicate the 92 MB model layer.
+RUN useradd --create-home appuser
 USER appuser
 
 EXPOSE 8501
