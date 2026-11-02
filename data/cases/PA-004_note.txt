@@ -1,0 +1,9 @@
+SYNTHETIC CLINICAL NOTE - FICTIONAL PATIENT - FOR DEMONSTRATION ONLY
+
+Orthopedic clinic visit.
+History: 63-year-old patient with persistent left groin and hip pain for 2 years. Pain limits walking to about 15 minutes and makes putting on shoes difficult.
+Assessment: Osteoarthritis of the left hip.
+Imaging: AP pelvis radiograph shows severe joint space loss of the left hip with subchondral sclerosis.
+Treatment to date: Completed 10 weeks of physical therapy. Uses meloxicam daily. Lost 15 pounds through a supervised weight-loss program. Walks with a cane.
+Response: Pain persists with no meaningful improvement.
+Plan: Request left total hip arthroplasty.

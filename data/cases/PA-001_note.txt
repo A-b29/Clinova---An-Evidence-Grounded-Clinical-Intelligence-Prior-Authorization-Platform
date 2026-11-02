@@ -1,0 +1,9 @@
+SYNTHETIC CLINICAL NOTE - FICTIONAL PATIENT - FOR DEMONSTRATION ONLY
+
+Orthopedic clinic visit.
+History: 67-year-old patient with right knee pain for 18 months. The pain is persistent, worse on stairs, and limits daily activities such as walking more than one block.
+Assessment: Primary osteoarthritis of the right knee.
+Imaging: Weight-bearing radiographs of the right knee show advanced osteoarthritis with severe medial joint space narrowing and osteophytes.
+Treatment to date: Completed 12 weeks of supervised physiotherapy. Took naproxen (an NSAID) for 6 months. Received one corticosteroid injection in March.
+Response: Reports inadequate relief despite these treatments.
+Plan: Request right total knee arthroplasty given persistent pain and functional limitation after conservative management.

@@ -1,0 +1,9 @@
+SYNTHETIC CLINICAL NOTE - FICTIONAL PATIENT - FOR DEMONSTRATION ONLY
+
+Orthopedic clinic visit.
+History: 49-year-old patient with persistent right groin pain for 8 months, worse with weight bearing, and difficulty walking.
+Assessment: Avascular necrosis of the right femoral head.
+Imaging: MRI of the right hip shows avascular necrosis of the femoral head with early collapse.
+Treatment to date: Patient tried physical therapy for 6 weeks with minimal relief. Uses naproxen as needed.
+Medication and therapy reconciliation: Patient declined physical therapy.
+Plan: Request right total hip arthroplasty.

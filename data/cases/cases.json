@@ -1,0 +1,9 @@
+[
+  {"case_id": "PA-001", "split": "dev", "requested_procedure": "Total knee arthroplasty", "procedure_code": "27447", "diagnosis": "Osteoarthritis of the right knee", "diagnosis_code": "M17.11", "note_file": "PA-001_note.txt"},
+  {"case_id": "PA-002", "split": "dev", "requested_procedure": "Total knee arthroplasty", "procedure_code": "27447", "diagnosis": "Osteoarthritis of the left knee", "diagnosis_code": "M17.12", "note_file": "PA-002_note.txt"},
+  {"case_id": "PA-003", "split": "dev", "requested_procedure": "Total knee arthroplasty", "procedure_code": "27447", "diagnosis": "Osteoarthritis of the right knee", "diagnosis_code": "M17.11", "note_file": "PA-003_note.txt"},
+  {"case_id": "PA-004", "split": "dev", "requested_procedure": "Total hip arthroplasty", "procedure_code": "27130", "diagnosis": "Osteoarthritis of the left hip", "diagnosis_code": "M16.12", "note_file": "PA-004_note.txt"},
+  {"case_id": "PA-005", "split": "dev", "requested_procedure": "Total hip arthroplasty", "procedure_code": "27130", "diagnosis": "Osteoarthritis of the right hip", "diagnosis_code": "M16.11", "note_file": "PA-005_note.txt"},
+  {"case_id": "PA-006", "split": "heldout", "requested_procedure": "Total knee arthroplasty", "procedure_code": "27447", "diagnosis": "Osteoarthritis of the left knee", "diagnosis_code": "M17.12", "note_file": "PA-006_note.txt"},
+  {"case_id": "PA-007", "split": "heldout", "requested_procedure": "Total knee arthroplasty", "procedure_code": "27447", "diagnosis": "Osteoarthritis of the knee", "diagnosis_code": "M17.9", "note_file": "PA-007_note.txt"}
+]

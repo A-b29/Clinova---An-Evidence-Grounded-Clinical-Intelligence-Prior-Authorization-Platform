@@ -1,0 +1,7 @@
+SYNTHETIC CLINICAL NOTE - FICTIONAL PATIENT - FOR DEMONSTRATION ONLY
+
+CC: L knee pain x 2 yrs, worsening, now limiting ambulation.
+Dx: DJD L knee.
+XR L knee: tricompartmental degenerative changes, KL grade 4, bone-on-bone medial compartment.
+Has completed a course of formal rehab and taken anti-inflammatories without benefit.
+Plan: L TKA.

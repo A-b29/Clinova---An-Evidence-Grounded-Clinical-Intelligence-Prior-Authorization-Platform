@@ -1,0 +1,102 @@
+{
+  "_notes": "Hand-labelled expectations. Fact keys: normalized value, '<documented>' for free-text fields (imaging_findings, symptom_duration), 'NOT ' prefix = negated mention. PA-006/PA-007 are held-out: written in clinical shorthand and never used to tune the rule lexicon.",
+  "criterion_sections": {
+    "C1": "Criterion 1: Diagnosis",
+    "C2": "Criterion 2: Imaging findings",
+    "C3": "Criterion 3: Conservative treatment",
+    "C4": "Criterion 4: Persistent symptoms and clinical rationale"
+  },
+  "cases": [
+    {
+      "case_id": "PA-001",
+      "expected_policy_document": "policy_total_knee_arthroplasty.md",
+      "expected_status": {"C1": "SUPPORTED", "C2": "SUPPORTED", "C3": "SUPPORTED", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["osteoarthritis"],
+        "symptoms": ["pain", "functional limitation"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["<documented>"],
+        "prior_treatments": ["physical therapy", "NSAIDs", "corticosteroid injection"],
+        "treatment_response": ["inadequate relief"]
+      }
+    },
+    {
+      "case_id": "PA-002",
+      "expected_policy_document": "policy_total_knee_arthroplasty.md",
+      "expected_status": {"C1": "SUPPORTED", "C2": "NOT_FOUND", "C3": "NOT_FOUND", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["osteoarthritis"],
+        "symptoms": ["pain", "stiffness", "functional limitation"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["NOT <documented>"],
+        "prior_treatments": [],
+        "treatment_response": []
+      }
+    },
+    {
+      "case_id": "PA-003",
+      "expected_policy_document": "policy_total_knee_arthroplasty.md",
+      "expected_status": {"C1": "SUPPORTED", "C2": "CONFLICTING", "C3": "SUPPORTED", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["osteoarthritis"],
+        "symptoms": ["pain", "functional limitation"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["<documented>"],
+        "prior_treatments": ["physical therapy", "NSAIDs"],
+        "treatment_response": ["inadequate relief"]
+      }
+    },
+    {
+      "case_id": "PA-004",
+      "expected_policy_document": "policy_total_hip_arthroplasty.md",
+      "expected_status": {"C1": "SUPPORTED", "C2": "SUPPORTED", "C3": "SUPPORTED", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["osteoarthritis"],
+        "symptoms": ["pain", "functional limitation"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["<documented>"],
+        "prior_treatments": ["physical therapy", "NSAIDs", "weight loss", "assistive device"],
+        "treatment_response": ["inadequate relief"]
+      }
+    },
+    {
+      "case_id": "PA-005",
+      "expected_policy_document": "policy_total_hip_arthroplasty.md",
+      "expected_status": {"C1": "CONFLICTING", "C2": "SUPPORTED", "C3": "CONFLICTING", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["avascular necrosis"],
+        "symptoms": ["pain", "functional limitation"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["<documented>"],
+        "prior_treatments": ["physical therapy", "NSAIDs", "NOT physical therapy"],
+        "treatment_response": ["inadequate relief"]
+      }
+    },
+    {
+      "case_id": "PA-006",
+      "expected_policy_document": "policy_total_knee_arthroplasty.md",
+      "expected_status": {"C1": "SUPPORTED", "C2": "SUPPORTED", "C3": "SUPPORTED", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["osteoarthritis"],
+        "symptoms": ["pain", "functional limitation"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["<documented>"],
+        "prior_treatments": ["physical therapy", "NSAIDs"],
+        "treatment_response": ["inadequate relief"]
+      }
+    },
+    {
+      "case_id": "PA-007",
+      "expected_policy_document": "policy_total_knee_arthroplasty.md",
+      "expected_status": {"C1": "SUPPORTED", "C2": "NOT_FOUND", "C3": "NOT_FOUND", "C4": "SUPPORTED"},
+      "expected_facts": {
+        "diagnosis": ["osteoarthritis"],
+        "symptoms": ["pain"],
+        "symptom_duration": ["<documented>"],
+        "imaging_findings": ["NOT <documented>"],
+        "prior_treatments": ["NOT physical therapy"],
+        "treatment_response": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Versions verified together on 2026-11-02. torch comes in via sentence-transformers;
+# the Dockerfile pre-installs the CPU-only build to keep the image small.
+streamlit==1.56.0
+pydantic==2.13.2
+numpy==2.4.4
+scikit-learn==1.8.0
+sentence-transformers==6.2.0
+anthropic==0.97.0
+PyMuPDF==1.27.2.3
+pytest==9.0.3

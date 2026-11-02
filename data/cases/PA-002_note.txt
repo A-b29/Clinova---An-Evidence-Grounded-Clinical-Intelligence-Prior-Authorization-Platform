@@ -1,0 +1,7 @@
+SYNTHETIC CLINICAL NOTE - FICTIONAL PATIENT - FOR DEMONSTRATION ONLY
+
+Orthopedic clinic visit.
+History: 58-year-old patient with left knee pain and stiffness for several months. Symptoms are persistent and make it difficult to climb stairs.
+Assessment: Osteoarthritis of the left knee.
+Imaging has not yet been obtained.
+Plan: Discuss total knee arthroplasty; patient wishes to proceed with a prior-authorization request.

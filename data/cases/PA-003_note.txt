@@ -1,0 +1,9 @@
+SYNTHETIC CLINICAL NOTE - FICTIONAL PATIENT - FOR DEMONSTRATION ONLY
+
+Orthopedic clinic visit.
+History: 71-year-old patient with chronic right knee pain for 3 years that limits walking.
+Assessment: Osteoarthritis of the right knee.
+Radiology report: Right knee X-ray shows mild joint space narrowing and no significant osteophytes.
+Clinic summary: Imaging shows advanced, bone-on-bone osteoarthritis of the right knee.
+Treatment: Completed 8 weeks of physical therapy and a trial of ibuprofen with inadequate relief.
+Plan: Request right total knee arthroplasty.
