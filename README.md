@@ -32,7 +32,13 @@ Clinova reads a prior-authorization request and its clinical note. It pulls out 
 
 ## Example output
 
-`python -m src.pipeline PA-003`: a knee-replacement request where the radiology line and the clinic summary disagree.
+![Clinova reviewing case PA-003: a summary of four criteria, criterion cards with cited evidence, and the clinical note with each cited sentence highlighted](docs/screenshot.png)
+
+The reviewer UI on case PA-003. The radiology line and the clinic summary disagree on severity, so C2 is flagged
+`CONFLICTING`. Every sentence the review relies on is highlighted in the note and tagged with the criteria it supports.
+Links such as `?case=PA-003` open a case directly.
+
+The CLI gives the same checklist (`python -m src.pipeline PA-003`):
 
 | # | Criterion | Status | Explanation |
 |---|---|---|---|
@@ -99,10 +105,12 @@ walkthrough and the 15 design decisions behind it are in
 | `src/retrieval.py` | MiniLM / TF-IDF embeddings, in-memory cosine index, procedure-code routing |
 | `src/assessment.py` | The four criteria, status rules, conflict detection, follow-up questions |
 | `src/reporting.py` | Deterministic Markdown report |
+| `src/ui.py` | HTML components for the UI (summary, criterion cards, highlighted note); all text is escaped |
 | `src/pipeline.py` | End-to-end `review_case()` and the CLI |
 | `app.py` | Streamlit UI (sample cases or upload a TXT/PDF note) |
+| `assets/`, `.streamlit/` | Logo, stylesheet and theme |
 | `eval/` | Hand-labelled expectations (`evaluation_cases.json`) and `run_eval.py` |
-| `tests/` | pytest suite (schemas, extraction, retrieval, assessment) |
+| `tests/` | pytest suite (schemas, extraction, retrieval, assessment, UI) |
 | `data/cases/` | 7 synthetic cases (5 dev + 2 held-out) |
 | `data/policies/` | 5 illustrative policy documents (TKA, THA, knee arthroscopy, lumbar MRI, general) |
 
@@ -176,11 +184,11 @@ The production roadmap is in [docs/MODEL_FLOW_AND_DECISIONS.md](docs/MODEL_FLOW_
 <summary><b>5-minute demo script</b></summary>
 
 1. `streamlit run app.py` and read the safety banner out loud.
-2. **PA-001** (happy path): four green tiles. Open *Extracted facts*: every row has an evidence sentence copied word for word from the note. Open *Criteria checklist*: each criterion cites the TKA policy section it maps to.
+2. **PA-001** (happy path): four green tiles and "Documentation complete". In the *Review* tab, each criterion card quotes its evidence sentence and cites the TKA policy section it maps to, and the note on the right highlights every cited sentence. *Extracted facts* shows the same facts as a table.
 3. **PA-002** (missing documents): imaging and conservative treatment come out `NOT_FOUND`. Point out the wording *"does not establish that the criterion is unmet"* and the generated questions for the provider.
-4. **PA-003** (conflict): C2 is `CONFLICTING` because the radiology line says *mild* and the clinic summary says *advanced, bone-on-bone*. That's exactly what a reviewer needs to see.
+4. **PA-003** (conflict): C2 is `CONFLICTING` because the radiology line says *mild* and the clinic summary says *advanced, bone-on-bone*. Both sentences are highlighted in red in the note. That's exactly what a reviewer needs to see.
 5. **PA-005**: the diagnosis doesn't match (the request says osteoarthritis, the note says avascular necrosis), and PT was both "tried" and "declined".
-6. Open the *Review report* tab and download the Markdown/JSON.
+6. Show *Ask the provider* and its copy-as-message box, then *Download report* / *Export JSON*.
 7. Close with the eval table and the held-out miss on PA-006, and explain why it motivates the LLM extractor and a larger labelled set.
 
 </details>

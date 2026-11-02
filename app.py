@@ -1,14 +1,31 @@
-"""Streamlit reviewer UI.  Run:  streamlit run app.py"""
+"""Clinova reviewer UI.  Run:  streamlit run app.py"""
 import os
+from pathlib import Path
 
 import streamlit as st
 
+from src import ui
 from src.ingestion import load_cases, read_document
 from src.pipeline import DEFAULT_BACKEND, build_index, review_case
-from src.reporting import ICON, to_markdown
+from src.reporting import to_markdown
 from src.schemas import FACT_FIELDS, CaseRequest
 
-st.set_page_config(page_title="Prior-Auth Review Copilot", page_icon="🩺", layout="wide")
+ASSETS = Path(__file__).parent / "assets"
+REPO = "https://github.com/A-b29/Clinova---An-Evidence-Grounded-Clinical-Intelligence-Prior-Authorization-Platform"
+SCENARIOS = {
+    "PA-001": "Complete documentation: the happy path.",
+    "PA-002": "Imaging and conservative treatment are missing from the note.",
+    "PA-003": "The radiology report and the clinic summary disagree on severity.",
+    "PA-004": "Complete documentation under a different policy (hip).",
+    "PA-005": "Request and note disagree on the diagnosis; PT is both tried and declined.",
+    "PA-006": "Held-out: clinical shorthand the rules weren't written for.",
+    "PA-007": "Held-out: explicit negations (\"denies PT\", \"no imaging on file\").",
+}
+
+st.set_page_config(page_title="Clinova · Prior-authorization review", page_icon=str(ASSETS / "mark.svg"),
+                   layout="wide")
+st.logo(str(ASSETS / "logo.svg"), icon_image=str(ASSETS / "mark.svg"), size="large")
+st.html(ASSETS / "style.css")
 
 
 @st.cache_resource(show_spinner="Loading policy index…")
@@ -16,84 +33,92 @@ def get_index():
     return build_index(DEFAULT_BACKEND)
 
 
-st.title("🩺 Clinical Claims Intelligence & Prior-Authorization Copilot")
-st.warning("**Educational prototype.** Synthetic data and illustrative policies only. It does not approve or deny "
-           "requests or give medical advice. Decision-support output only; human review required.")
+def empty_state(title: str, body: str):
+    st.html(f'<div class="empty-state"><h3>{title}</h3><p>{body}</p></div>')
+    st.stop()
 
-cases = {req.case_id: req for req, _ in load_cases()}
+
+cases = {req.case_id: (req, split) for req, split in load_cases()}
+index = get_index()
+has_key = bool(os.getenv("ANTHROPIC_API_KEY"))
+
 with st.sidebar:
-    st.header("Case")
-    source = st.radio("Input", ["Sample case", "Upload a note"], horizontal=True)
+    st.html('<div class="side-label">Case</div>')
+    source = st.segmented_control("Input", ["Sample case", "Upload note"], default="Sample case", required=True,
+                                  label_visibility="collapsed", width="stretch")
     if source == "Sample case":
-        request = cases[st.selectbox("Synthetic case", sorted(cases))]
+        # bound to ?case=PA-003 so a demo link can open straight on a case
+        case_id = st.selectbox("Synthetic case", list(cases), key="case", bind="query-params")
+        request, split = cases[case_id]
     else:
         upload = st.file_uploader("Clinical note (.txt or .pdf)", type=["txt", "pdf"])
         case_id = st.text_input("Case ID", "PA-NEW")
         procedure = st.text_input("Requested procedure", "Total knee arthroplasty")
-        procedure_code = st.text_input("Procedure code (routes to the matching policy)", "27447")
+        procedure_code = st.text_input("Procedure code", "27447", help="Routes retrieval to the matching policy.")
         diagnosis = st.text_input("Request diagnosis", "Osteoarthritis of the knee")
         note = read_document(upload.getvalue(), upload.name) if upload else ""
-        if not note.strip():
-            st.info("Upload a synthetic note to continue. Do not upload real patient data.")
-            st.stop()
-        request = CaseRequest(case_id=case_id, requested_procedure=procedure, procedure_code=procedure_code or None,
-                              diagnosis=diagnosis, note_text=note)
+        request = split = None
+        if note.strip():
+            request, split = CaseRequest(case_id=case_id, requested_procedure=procedure, diagnosis=diagnosis,
+                                         procedure_code=procedure_code or None, note_text=note), "upload"
 
-    st.header("Models")
-    has_key = bool(os.getenv("ANTHROPIC_API_KEY"))
-    extractor = st.radio("Fact extractor", ["rules", "llm"], horizontal=True, disabled=not has_key,
-                         help="'llm' uses Claude and needs ANTHROPIC_API_KEY. Synthetic data only.")
-    st.caption(f"Retriever: `{get_index().backend}` · LLM: {'available' if has_key else 'no API key set'}")
+    st.html('<div class="side-label">Engine</div>')
+    extractor = st.segmented_control(
+        "Fact extractor", ["rules", "llm"], format_func={"rules": "Rules", "llm": "Claude"}.get, default="rules",
+        required=True, disabled=not has_key, width="stretch",
+        help="Claude needs ANTHROPIC_API_KEY. Use synthetic data only." if has_key else
+             "Set ANTHROPIC_API_KEY to enable the Claude extractor.")
+    st.caption(f"Retrieval: {index.backend} over {len(index.chunks)} policy passages, routed by CPT code.")
+    st.html(f'<div class="side-foot">Every status links to the note sentence and policy section behind it. '
+            f'Synthetic data only.<br><a href="{REPO}" target="_blank">Source on GitHub</a> · '
+            f'<a href="{REPO}/blob/main/docs/MODEL_FLOW_AND_DECISIONS.md" target="_blank">How it works</a></div>')
+
+st.html(ui.BANNER)
+if request is None:
+    empty_state("Upload a synthetic clinical note",
+                "Add a .txt or .pdf note in the sidebar to start a review. Never upload real patient data.")
 
 try:
-    review = review_case(request, get_index(), extractor)
+    review = review_case(request, index, extractor)
 except Exception as e:  # surface API / parsing failures instead of a blank page
     st.error(f"Review failed: {e}")
     st.stop()
 
-cols = st.columns(len(review.checklist))
-for col, r in zip(cols, review.checklist):
-    col.metric(f"{r.criterion_id}", f"{ICON[r.status]} {r.status}", help=r.criterion)
+head, actions = st.columns([4, 1], vertical_alignment="bottom")
+head.html(ui.case_header(review, SCENARIOS.get(request.case_id, "") if split != "upload" else "", split))
+report = to_markdown(review)
+actions.download_button("Download report", report, f"{request.case_id}_review.md", "text/markdown",
+                        type="primary", icon=":material/download:", width="stretch")
+actions.download_button("Export JSON", review.model_dump_json(indent=2), f"{request.case_id}_review.json",
+                        "application/json", icon=":material/data_object:", width="stretch")
+st.html(ui.overview(review))
 
-tab_note, tab_facts, tab_check, tab_report = st.tabs(
-    ["📄 Clinical note", "🔎 Extracted facts", "✅ Criteria checklist", "📝 Review report"])
+tab_review, tab_facts, tab_report = st.tabs(["Review", "Extracted facts", "Report preview"])
 
-with tab_note:
-    st.markdown(f"**{request.case_id}** · {request.requested_procedure} ({request.procedure_code or 'no code'}) · "
-                f"request diagnosis: {request.diagnosis}")
-    st.code(request.note_text, language=None)
+with tab_review:
+    left, right = st.columns([3, 2], gap="medium")
+    with left:
+        for r in review.checklist:
+            st.html(ui.criterion_card(r))
+        st.caption(review.checklist[0].uncertainty)
+    with right:
+        st.html(ui.highlight_note(review))
+        if review.follow_up_questions:
+            st.html(ui.follow_ups(review.follow_up_questions))
+            with st.expander("Copy as a message to the provider", icon=":material/content_copy:"):
+                st.code("\n".join(review.follow_up_questions), language=None, wrap_lines=True)
 
 with tab_facts:
-    rows = [{"field": field, "value": f.value, "negated": f.negated, "evidence (verbatim from note)": f.evidence}
+    rows = [{"Fact type": field.replace("_", " ").capitalize(), "Value": f.value,
+             "Assertion": "Negated" if f.negated else "Affirmed", "Evidence (verbatim from note)": f.evidence}
             for field in FACT_FIELDS for f in getattr(review.facts, field)]
-    st.dataframe(rows, width="stretch", hide_index=True)
-    if review.facts.uncertain_or_missing:
-        st.markdown("**Uncertain or missing**\n" + "\n".join(f"- {m}" for m in review.facts.uncertain_or_missing))
-    with st.expander("Validated JSON"):
+    st.dataframe(rows, hide_index=True, column_config={
+        "Evidence (verbatim from note)": st.column_config.TextColumn(width="large")})
+    for m in review.facts.uncertain_or_missing:
+        st.caption(f"• {m.replace('_', ' ').capitalize()}")
+    with st.expander("Validated JSON", icon=":material/data_object:"):
         st.json(review.facts.model_dump())
 
-with tab_check:
-    for r in review.checklist:
-        with st.container(border=True):
-            st.markdown(f"#### {ICON[r.status]} {r.criterion_id}. {r.criterion}: `{r.status}`")
-            st.write(r.explanation)
-            st.caption(r.uncertainty)
-            left, right = st.columns(2)
-            left.markdown("**Clinical-note evidence**")
-            for f in r.note_evidence:
-                left.markdown(f"- {'~~' if f.negated else ''}`{f.value}`{'~~ (negated)' if f.negated else ''}: "
-                              f"_{f.evidence}_")
-            if not r.note_evidence:
-                left.markdown("_None found in the submitted note._")
-            right.markdown("**Retrieved policy passages**")
-            for p in r.policy_passages:
-                with right.expander(f"{p.document} § {p.section} (score {p.score:.2f})"):
-                    st.write(p.text)
-
 with tab_report:
-    report = to_markdown(review)
-    c1, c2 = st.columns(2)
-    c1.download_button("⬇️ Report (.md)", report, f"{request.case_id}_review.md", "text/markdown")
-    c2.download_button("⬇️ Full review (.json)", review.model_dump_json(indent=2), f"{request.case_id}_review.json",
-                       "application/json")
-    st.markdown(report)
+    with st.container(border=True):
+        st.markdown(report)
